@@ -2,6 +2,7 @@
 # coding: cp932
 
 import sys
+import os
 import pandas
 
 ##-----------------------------------------------------------------------##
@@ -42,6 +43,14 @@ if __name__ == "__main__":
 
     if argc <= 2:
         print("Usage: python %s file1 file2" %(args[0]))
+        exit()
+
+    if ( os.path.isfile(args[1]) != True ):
+        print("%s not found." %(args[1]))
+        exit(0)
+        
+    if ( os.path.isfile(args[2]) != True ):
+        print("%s not found." %(args[2]))
         exit(0)
 
     lines1 = []
