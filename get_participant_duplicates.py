@@ -5,13 +5,20 @@ import urllib.request, urllib.error
 from bs4 import BeautifulSoup
 
 ##-------------------------------------------------------##
+## 引数エラー時のメッセージ出力
+##-------------------------------------------------------##
+def print_arg_error(commandName):
+    print("Usage: python %s connpassURL1 connpassURL2" %(commandName))
+    print("\nexample)")
+    print("python %s https://GROUP_A.connpass.com/event/xxxxx/ https://GROUP_B.connpass.com/event/yyyyy/\n" %(commandName))
+    exit(0)
+
+##-------------------------------------------------------##
 ## 引数のチェック
 ##-------------------------------------------------------##
 def check_args(commandName, url):
     if ((url.rfind("https://") < 0) and (url.rfind("http://") < 0)):
-        print("Usage: python %s connpassURL1 connpassURL2" %(commandName))
-        print("ex) > python %s https://xxxxxx.connpass.com/event/xxxxx/" %(commandName))
-        exit(0)
+        print_arg_error(commandName)
 
 ##-------------------------------------------------------##
 ## URLのチェック
@@ -71,12 +78,11 @@ if __name__ == "__main__":
     args = sys.argv
     argc = len(args)
 
-    # アクセスするURL
-    # url = "https://xxxxxx.connpass.com/event/xxxxx/participation/"
+    # URL Format
+    # "https://xxxxxx.connpass.com/event/xxxxx/"
 
     if argc <= 2:
-        print("Usage: python %s connpassURL1 connpassURL2" %(args[0]))
-        exit(0)
+        print_arg_error(args[0])
 
     check_args(args[0], args[1])
     check_args(args[0], args[2])
