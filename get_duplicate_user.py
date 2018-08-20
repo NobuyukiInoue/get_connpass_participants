@@ -9,7 +9,6 @@ import pandas
 ## [グループ名_イベントID_YYYYmmdd_HHMMSS.csv]を開く
 ##-----------------------------------------------------------------------##
 def readCSVfile(fileName):
-
     # encodingは、必要に応じて書き換えてください。
     lines = pandas.read_csv(fileName, encoding="sjis")
 
@@ -19,7 +18,6 @@ def readCSVfile(fileName):
 ## ２つのcsv配列を比較し、２つめの配列にないレコードのidを返す
 ##-----------------------------------------------------------------------##
 def getDuplicateRecord(lines1, lines2):
-
     hit = False
     for i in range(0, len(lines1)):
         for j in range(0, len(lines2)):
@@ -37,7 +35,6 @@ def getDuplicateRecord(lines1, lines2):
 ## メイン
 ##-----------------------------------------------------------------------##
 if __name__ == "__main__":
-
     args = sys.argv
     argc = len(args)
 
