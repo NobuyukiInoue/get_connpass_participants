@@ -1,124 +1,102 @@
 # coding: cp932 
+
 import sys
-from datetime import datetime
-import urllib.request, urllib.error
+import urllib.request
+import urllib.error
 from bs4 import BeautifulSoup
 
-##-------------------------------------------------------##
-## 引数エラー時のメッセージ出力
-##-------------------------------------------------------##
+
 def print_arg_error(commandName):
-    print("Usage: python %s connpassURL1 connpassURL2" %(commandName))
-    print("\nexample)")
-    print("python %s https://GROUP_A.connpass.com/event/xxxxx/ https://GROUP_B.connpass.com/event/yyyyy/\n" %(commandName))
+    """引数エラー時のメッセージ出力"""
+    print("Usage: python {cmd} connpassURL1 connpassURL2\n"
+          "\n"
+          "example)\n"
+          "python {cmd} https://GROUP_A.connpass.com/event/xxxxx/"
+                      " https://GROUP_B.connpass.com/event/yyyyy/"
+          .format(cmd=commandName))
     exit(0)
 
-##-------------------------------------------------------##
-## 引数のチェック
-##-------------------------------------------------------##
-def check_args(commandName, url):
-    if ((url.rfind("https://") < 0) and (url.rfind("http://") < 0)):
-        print_arg_error(commandName)
 
-##-------------------------------------------------------##
-## URLのチェック
-##-------------------------------------------------------##
-def check_Directory_participation(url):
-    if (url.rfind("/participation/") >= 0):
-        new_url = url
-    elif (args[1].rfind("/participation") >= 0):
-        new_url = url + "/"
+def is_url(url):
+    """URL書式チェック"""
+    return url.startswith("https://") or url.startswith("http://")
+
+
+def participation_url(url):
+    """参加者URLに変換"""
+    if url.endswith("/participation/"):
+        return url
+    if url.endswith("/participation"):
+        return url + "/"
+    if url.endswith("/"):
+        return url + "participation/"
     else:
-        if (url.endswith("/")):
-            new_url = url + "participation/"
-        else:
-            new_url = url + "/participation/"
-    
-    return(new_url)
+        return url + "/participation/"
 
-##-------------------------------------------------------##
-## ユーザー情報の取得
-##-------------------------------------------------------##
-def ulist_add(td):
-    ulist = []
-    for tag in td:
+
+def users(tags):
+    """ユーザー情報の取得(ユーザ名とユーザURLのCSV形式)"""
+    for tag in tags:
         try:
-            if ((tag.text != "") and (tag.text != "\n\n")):
-                hrefStr = tag['href']
-                if ((hrefStr.find("/open/") >= 0) or (hrefStr.find("/user/") >= 0)):
-                    # csv形式でリストに出力
-                    ulist.append("\"" + tag.text + "\",\"" + hrefStr +"\"\n")
+            if tag.text and tag.text != "\n\n":
+                href = tag['href']
+                if "/open/" in href or "/user/" in href:
+                    yield '"{name}","{url}"\n'.format(name=tag.text, url=href)
         except:
             pass
-    
-    return(ulist)
 
-##-----------------------------------------------------------------------##
-## ２つのcsv配列を比較し、profile URLが一致するレコードを出力する
-##-----------------------------------------------------------------------##
-def getDuplicateRecord(lines1, lines2):
-    hit = False
-    for data1 in lines1:
-        flds1 = data1.split(",")
-        for data2 in lines2:
-            flds2 = data2.split(",")
-            # profileのURLが一致しているか調べる
-            if (flds1[1] == flds2[1]):
-                hit = True
-                print("%s" %data1, end="")
 
-                # 見つかった場合は次のレコードへ
-                break
-    return hit
+def getDuplicateUsers(users1, users2):
+    """２つのcsv配列を比較し、profile URLが一致するレコードを出力する"""
+    urls2 = {user2.split(",")[1] for user2 in users2}
+    for user1 in users1:
+        name1, url1 = user1.split(",")
+        if url1 in urls2:
+            yield user1
 
-##-------------------------------------------------------##
-## メイン
-##-------------------------------------------------------##
-if __name__ == "__main__":
-    args = sys.argv
-    argc = len(args)
+
+class Connpass:
+    """Compassイベント参加者情報"""
+
+    def __init__(self, url):
+        self.url = participation_url(url)
+        html = urllib.request.urlopen(self.url)
+        soup = BeautifulSoup(html, "html.parser")
+        tags = soup.find_all("a")
+        self.users = list(users(tags))
+
+    def show_users(self):
+        """抽出した参加者リストを標準出力に表示する"""
+        print("\n===== %s ==== " % self.url)
+        for user in self.users:
+            print(user, end="")
+
+
+def main():
 
     # URL Format
     # "https://xxxxxx.connpass.com/event/xxxxx/"
 
-    if argc <= 2:
-        print_arg_error(args[0])
+    cmd, *args = sys.argv
+    argc = len(args)
+    if argc != 2:
+        print_arg_error(cmd)
+    url1, url2 = args
 
-    check_args(args[0], args[1])
-    check_args(args[0], args[2])
+    if not is_url(url1) or not is_url(url2):
+        print_arg_error(cmd)
 
-    # URLをチェック後、リストに格納する
-    url = []
-    url.append(check_Directory_participation(args[1]))
-    url.append(check_Directory_participation(args[2]))
+    connpass1 = Connpass(url1)
+    connpass2 = Connpass(url2)
 
-    # 指定したURLの出力htmlを取得する 
-    html = []
-    html.append(urllib.request.urlopen(url[0]))
-    html.append(urllib.request.urlopen(url[1]))
-
-    # htmlをBeautifulSoupに取り込む
-    soup = []
-    soup.append(BeautifulSoup(html[0], "html.parser"))
-    soup.append(BeautifulSoup(html[1], "html.parser"))
-
-    # すべての<A>タグを抽出する
-    td = []
-    td.append(soup[0].find_all("a"))
-    td.append(soup[1].find_all("a"))
-
-    # ユーザー情報の取得
-    ulist = [[]]
-    ulist[0] = ulist_add(td[0])
-    ulist.append(ulist_add(td[1]))
-
-    # 抽出したリストを標準出力に表示する
-    for i in range(0, len(ulist)):
-        print("\n===== %s ==== " %url[i])
-        for user in ulist[i]:
-            print(user, end="")
+    connpass1.show_users()
+    connpass2.show_users()
 
     # 重複するユーザーを表示する
     print("\n===== Duplicate Users ==== ")
-    getDuplicateRecord(ulist[0], ulist[1])
+    for user in getDuplicateUsers(connpass1.users, connpass2.users):
+        print(user, end="")
     print()
+
+if __name__ == "__main__":
+    main()
