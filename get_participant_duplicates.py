@@ -1,4 +1,4 @@
-# coding: cp932 
+# coding: utf-8
 
 import sys
 import urllib.request
@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 
 def print_arg_error(commandName):
-    """ˆø”ƒGƒ‰[‚ÌƒƒbƒZ[ƒWo—Í"""
+    """å¼•æ•°ã‚¨ãƒ©ãƒ¼æ™‚ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›"""
     print("Usage: python {cmd} connpassURL1 connpassURL2\n"
           "\n"
           "example)\n"
@@ -18,12 +18,12 @@ def print_arg_error(commandName):
 
 
 def is_url(url):
-    """URL‘®ƒ`ƒFƒbƒN"""
+    """URLæ›¸å¼ãƒã‚§ãƒƒã‚¯"""
     return url.startswith("https://") or url.startswith("http://")
 
 
 def participation_url(url):
-    """Q‰ÁÒURL‚É•ÏŠ·"""
+    """å‚åŠ è€…URLã«å¤‰æ›"""
     if url.endswith("/participation/"):
         return url
     if url.endswith("/participation"):
@@ -35,7 +35,7 @@ def participation_url(url):
 
 
 def users(tags):
-    """ƒ†[ƒU[î•ñ‚Ìæ“¾(ƒ†[ƒU–¼‚Æƒ†[ƒUURL‚ÌCSVŒ`®)"""
+    """ãƒ¦ãƒ¼ã‚¶ãƒ¼æƒ…å ±ã®å–å¾—(ãƒ¦ãƒ¼ã‚¶åã¨ãƒ¦ãƒ¼ã‚¶URLã®CSVå½¢å¼)"""
     for tag in tags:
         try:
             if tag.text and tag.text != "\n\n":
@@ -47,7 +47,7 @@ def users(tags):
 
 
 def getDuplicateUsers(users1, users2):
-    """‚Q‚Â‚Ìcsv”z—ñ‚ğ”äŠr‚µAprofile URL‚ªˆê’v‚·‚éƒŒƒR[ƒh‚ğo—Í‚·‚é"""
+    """ï¼’ã¤ã®csvé…åˆ—ã‚’æ¯”è¼ƒã—ã€profile URLãŒä¸€è‡´ã™ã‚‹ãƒ¬ã‚³ãƒ¼ãƒ‰ã‚’å‡ºåŠ›ã™ã‚‹"""
     urls2 = {user2.split(",")[1] for user2 in users2}
     for user1 in users1:
         name1, url1 = user1.split(",")
@@ -56,7 +56,7 @@ def getDuplicateUsers(users1, users2):
 
 
 class Connpass:
-    """CompassƒCƒxƒ“ƒgQ‰ÁÒî•ñ"""
+    """Compassã‚¤ãƒ™ãƒ³ãƒˆå‚åŠ è€…æƒ…å ±"""
 
     def __init__(self, url):
         self.url = participation_url(url)
@@ -66,7 +66,7 @@ class Connpass:
         self.users = list(users(tags))
 
     def show_users(self):
-        """’Šo‚µ‚½Q‰ÁÒƒŠƒXƒg‚ğ•W€o—Í‚É•\¦‚·‚é"""
+        """æŠ½å‡ºã—ãŸå‚åŠ è€…ãƒªã‚¹ãƒˆã‚’æ¨™æº–å‡ºåŠ›ã«è¡¨ç¤ºã™ã‚‹"""
         print("\n===== %s ==== " % self.url)
         for user in self.users:
             print(user, end="")
@@ -92,7 +92,7 @@ def main():
     connpass1.show_users()
     connpass2.show_users()
 
-    # d•¡‚·‚éƒ†[ƒU[‚ğ•\¦‚·‚é
+    # é‡è¤‡ã™ã‚‹ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚’è¡¨ç¤ºã™ã‚‹
     print("\n===== Duplicate Users ==== ")
     for user in getDuplicateUsers(connpass1.users, connpass2.users):
         print(user, end="")

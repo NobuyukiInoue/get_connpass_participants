@@ -1,12 +1,14 @@
-# coding: cp932 
+# coding: utf-8
+
 import sys
 from datetime import datetime
 
 import urllib.request, urllib.error
 from bs4 import BeautifulSoup
 
+
 def print_arg_error(commandName):
-    """ˆø”ƒGƒ‰[‚ÌƒƒbƒZ[ƒWo—Í"""
+    """å¼•æ•°ã‚¨ãƒ©ãƒ¼æ™‚ã®ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›"""
     print("Usage: python {cmd} connpassURL\n"
           "\n"
           "example)\n"
@@ -16,12 +18,12 @@ def print_arg_error(commandName):
 
 
 def is_url(url):
-    """URL‘®ƒ`ƒFƒbƒN"""
+    """URLæ›¸å¼ãƒã‚§ãƒƒã‚¯"""
     return url.startswith("https://") or url.startswith("http://")
 
 
 def participation_url(url):
-    """Q‰ÁÒURL‚É•ÏŠ·"""
+    """å‚åŠ è€…URLã«å¤‰æ›"""
     if url.endswith("/participation/"):
         return url
     if url.endswith("/participation"):
@@ -33,12 +35,12 @@ def participation_url(url):
 
 
 def getgrpName(url, extention):
-    """ƒOƒ‹[ƒv–¼‚ÆƒCƒxƒ“ƒg”Ô†‚ğæ‚èo‚µ‚Äƒtƒ@ƒCƒ‹–¼‚Æ‚·‚é"""
+    """ã‚°ãƒ«ãƒ¼ãƒ—åã¨ã‚¤ãƒ™ãƒ³ãƒˆç•ªå·ã‚’å–ã‚Šå‡ºã—ã¦ãƒ•ã‚¡ã‚¤ãƒ«åã¨ã™ã‚‹"""
 
     # url format
     # "https://<groupName>.connpass.com/event/<eventId>/participation/"
 
-    # <groupName>‚ğæ‚èo‚·
+    # <groupName>ã‚’å–ã‚Šå‡ºã™
     pos_l1 = url.find("/")
     pos_l2 = url.find("/", pos_l1 + 1)
     pos_l3 = url.find(".")
@@ -49,7 +51,7 @@ def getgrpName(url, extention):
 
     groupName = url[pos_l2 + 1:pos_l3]
 
-    # <eventId>‚ğæ‚èo‚·
+    # <eventId>ã‚’å–ã‚Šå‡ºã™
     pos_r1 = url.rfind("/")
     pos_r2 = url.rfind("/", 0, pos_r1 - 1)
     pos_r3 = url.rfind("/", 0, pos_r2 - 1)
@@ -60,14 +62,14 @@ def getgrpName(url, extention):
 
     eventId = url[pos_r3 + 1:pos_r2]
 
-    # Œ»İ‚Ì‚ğ”NAŒA“úAA•ªA•b‚Åæ“¾
+    # ç¾åœ¨ã®æ™‚åˆ»ã‚’å¹´ã€æœˆã€æ—¥ã€æ™‚ã€åˆ†ã€ç§’ã§å–å¾—
     dateStr = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     return(groupName + "_" + eventId + "_" + dateStr + extention)
 
 
 def users(tags):
-    """ƒ†[ƒU[î•ñ‚Ìæ“¾(ƒ†[ƒU–¼‚Æƒ†[ƒUURL‚ÌCSVŒ`®)"""
+    """ãƒ¦ãƒ¼ã‚¶ãƒ¼æƒ…å ±ã®å–å¾—(ãƒ¦ãƒ¼ã‚¶åã¨ãƒ¦ãƒ¼ã‚¶URLã®CSVå½¢å¼)"""
     for tag in tags:
         try:
             if tag.text and tag.text != "\n\n":
@@ -87,35 +89,35 @@ def main():
     # URL Format
     # "https://xxxxxx.connpass.com/event/xxxxx/"
 
-    # URL‘®ƒ`ƒFƒbƒN
+    # URLæ›¸å¼ãƒã‚§ãƒƒã‚¯
     if not is_url(args[1]):
         print("URL Error...%s\n" %args[1])
         print_arg_error(args[0])
 
-    # Q‰ÁÒURL‚É•ÏŠ·
+    # å‚åŠ è€…URLã«å¤‰æ›
     url = participation_url(args[1])
 
     save_fname = getgrpName(url, ".csv")
     if (save_fname == ""):
         print_arg_error(args[0])
 
-    # w’è‚µ‚½URL‚Ìo—Íhtml‚ğæ“¾‚·‚é 
+    # æŒ‡å®šã—ãŸURLã®å‡ºåŠ›htmlã‚’å–å¾—ã™ã‚‹ 
     html = urllib.request.urlopen(url)
 
-    # html‚ğBeautifulSoup‚Éæ‚è‚Ş
+    # htmlã‚’BeautifulSoupã«å–ã‚Šè¾¼ã‚€
     soup = BeautifulSoup(html, "html.parser")
 
-    # ‚·‚×‚Ä‚Ì<A>ƒ^ƒO‚ğ’Šo‚·‚é
+    # ã™ã¹ã¦ã®<A>ã‚¿ã‚°ã‚’æŠ½å‡ºã™ã‚‹
     tags = soup.find_all("a")
 
-    # ƒ†[ƒU[î•ñ•Û‘¶—pƒŠƒXƒg‚ÉŠi”[
+    # ãƒ¦ãƒ¼ã‚¶ãƒ¼æƒ…å ±ä¿å­˜ç”¨ãƒªã‚¹ãƒˆã«æ ¼ç´
     ulist = list(users(tags))
 
-    # ’Šo‚µ‚½ƒŠƒXƒg‚ğ•W€o—Í‚É•\¦‚·‚é
+    # æŠ½å‡ºã—ãŸãƒªã‚¹ãƒˆã‚’æ¨™æº–å‡ºåŠ›ã«è¡¨ç¤ºã™ã‚‹
     for user in ulist:
         print(user, end="")
 
-    # ƒtƒ@ƒCƒ‹‚Éo—Í‚·‚é
+    # ãƒ•ã‚¡ã‚¤ãƒ«ã«å‡ºåŠ›ã™ã‚‹
     with open(save_fname, mode='w') as f:
         f.writelines(ulist)
 
