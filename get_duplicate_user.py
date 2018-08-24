@@ -5,6 +5,13 @@ import os
 import pandas
 
 
+def fileCheck(path):
+    """ファイルの存在チェック"""
+    if ( os.path.isfile(path) != True ):
+        print("%s not found." %path)
+        exit(0)
+
+
 def readCSVfile(fileName):
     """csvファイルを開く"""
 
@@ -38,24 +45,14 @@ def main():
         print("Usage: python %s file1 file2" %(args[0]))
         exit()
 
-    if ( os.path.isfile(args[1]) != True ):
-        print("%s not found." %(args[1]))
-        exit(0)
-        
-    if ( os.path.isfile(args[2]) != True ):
-        print("%s not found." %(args[2]))
-        exit(0)
-
-    lines1 = []
+    fileCheck(args[1])
+    fileCheck(args[2])
+    
     lines1 = readCSVfile(args[1])
-
-    lines2 = []
     lines2 = readCSVfile(args[2])
 
-    print()
-    print("=== Dupulicate users [%s] in [%s] ===" %(args[1], args[2]))
+    print("\n=== Dupulicate users [%s] in [%s] ===" %(args[1], args[2]))
     getDuplicateRecord(lines1, lines2)
-
     print()
 
 
