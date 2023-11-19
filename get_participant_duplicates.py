@@ -8,12 +8,12 @@ from bs4 import BeautifulSoup
 
 def print_arg_error(commandName):
     """引数エラー時のメッセージ出力"""
-    print("Usage: python {cmd} connpassURL1 connpassURL2\n"
+    print("Usage: python {0} connpassURL1 connpassURL2\n"
           "\n"
           "example)\n"
-          "python {cmd} https://GROUP_A.connpass.com/event/xxxxx/"
+          "python {0} https://GROUP_A.connpass.com/event/xxxxx/"
                       " https://GROUP_B.connpass.com/event/yyyyy/"
-          .format(cmd=commandName))
+          .format(commandName))
     exit(0)
 
 
@@ -26,9 +26,9 @@ def participation_url(url):
     """参加者URLに変換"""
     if url.endswith("/participation/"):
         return url
-    if url.endswith("/participation"):
+    elif url.endswith("/participation"):
         return url + "/"
-    if url.endswith("/"):
+    elif url.endswith("/"):
         return url + "participation/"
     else:
         return url + "/participation/"
@@ -47,10 +47,10 @@ def users(tags):
 
 
 def getDuplicateUsers(users1, users2):
-    """２つのcsv配列を比較し、profile URLが一致するレコードを出力する"""
+    """2つのcsv配列を比較し、profile URLが一致するレコードを出力する"""
     urls2 = {user2.split(",")[1] for user2 in users2}
     for user1 in users1:
-        name1, url1 = user1.split(",")
+        _name1, url1 = user1.split(",")
         if url1 in urls2:
             yield user1
 

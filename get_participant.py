@@ -9,11 +9,11 @@ from bs4 import BeautifulSoup
 
 def print_arg_error(commandName):
     """引数エラー時のメッセージ出力"""
-    print("Usage: python {cmd} connpassURL\n"
+    print("Usage: python {0} connpassURL\n"
           "\n"
           "example)\n"
-          "python {cmd} https://GROUP_NAME.connpass.com/event/xxxxx/"
-          .format(cmd=commandName))
+          "python {0} https://GROUP_NAME.connpass.com/event/xxxxx/"
+          .format(commandName))
     exit(0)
 
 
@@ -26,9 +26,9 @@ def participation_url(url):
     """参加者URLに変換"""
     if url.endswith("/participation/"):
         return url
-    if url.endswith("/participation"):
+    elif url.endswith("/participation"):
         return url + "/"
-    if url.endswith("/"):
+    elif url.endswith("/"):
         return url + "participation/"
     else:
         return url + "/participation/"
@@ -45,7 +45,7 @@ def getgrpName(url, extention):
     pos_l2 = url.find("/", pos_l1 + 1)
     pos_l3 = url.find(".")
 
-    if ((pos_l1 < 0) or (pos_l2 < 0) or (pos_l3 < 0)):
+    if pos_l1 < 0 or pos_l2 < 0 or pos_l3 < 0:
         print("groupName error...")
         return ""
 
@@ -60,7 +60,7 @@ def getgrpName(url, extention):
         print("eventId error...")
         return ""
 
-    eventId = url[pos_r3 + 1:pos_r2]
+    eventId = url[pos_r3 + 1 : pos_r2]
 
     # 現在の時刻を年、月、日、時、分、秒で取得
     dateStr = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -98,7 +98,7 @@ def main():
     url = participation_url(args[1])
 
     save_fname = getgrpName(url, ".csv")
-    if (save_fname == ""):
+    if save_fname == "":
         print_arg_error(args[0])
 
     # 指定したURLの出力htmlを取得する 
@@ -121,7 +121,7 @@ def main():
     with open(save_fname, mode='w') as f:
         f.writelines(ulist)
 
-    print("\nsave as ... [%s]" %(save_fname))
+    print("\nsave as ... [{0}]".format(save_fname))
 
 if __name__ == "__main__":
     main()
